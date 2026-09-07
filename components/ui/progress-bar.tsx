@@ -1,43 +1,46 @@
 "use client";
 
-const SEGMENTS = [20, 40, 60, 80, 100];
-
-function fillColor(pct: number): string {
-  if (pct >= 80) return "bg-emerald-500";
-  if (pct >= 60) return "bg-lime-500";
-  if (pct >= 40) return "bg-amber-400";
-  if (pct >= 20) return "bg-orange-500";
-  return "bg-red-500";
-}
+const SEGMENTS = [
+  { end: 20, color: "bg-red-500" },
+  { end: 40, color: "bg-orange-500" },
+  { end: 60, color: "bg-amber-400" },
+  { end: 80, color: "bg-lime-500" },
+  { end: 100, color: "bg-emerald-500" },
+];
 
 export function ProgressBar({ pct }: { pct: number }) {
   const clamped = Math.min(100, Math.max(0, pct));
 
   return (
     <div>
-      <div className="relative h-3 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
-        <div className="absolute inset-0 grid grid-cols-5">
-          {SEGMENTS.map((s, i) => (
+      <div className="flex gap-1">
+        {SEGMENTS.map((seg, i) => {
+          const start = i * 20;
+          const segFill = Math.min(100, Math.max(0, ((clamped - start) / 20) * 100));
+          return (
             <div
-              key={s}
-              className={`border-r last:border-0 ${
-                i % 2 === 0 ? "border-black/10 dark:border-white/10" : "border-black/5 dark:border-white/5"
-              }`}
-            />
-          ))}
-        </div>
-        <div
-          className={`relative h-full rounded-full ${fillColor(clamped)} transition-all duration-500`}
-          style={{ width: `${clamped}%` }}
-        />
+              key={seg.end}
+              className="h-3 flex-1 overflow-hidden rounded-md bg-slate-200 dark:bg-slate-700"
+            >
+              <div
+                className={`h-full rounded-md ${seg.color} transition-all duration-500`}
+                style={{ width: `${segFill}%` }}
+              />
+            </div>
+          );
+        })}
       </div>
-      <div className="mt-1 grid grid-cols-5 text-center text-[10px] font-medium">
-        {SEGMENTS.map((s) => (
+      <div className="mt-1 flex gap-1">
+        {SEGMENTS.map((seg) => (
           <span
-            key={s}
-            className={clamped >= s ? "text-slate-700 dark:text-slate-200" : "text-slate-400 dark:text-slate-500"}
+            key={seg.end}
+            className={`flex-1 text-center text-[10px] font-medium ${
+              clamped >= seg.end
+                ? "text-slate-700 dark:text-slate-200"
+                : "text-slate-400 dark:text-slate-500"
+            }`}
           >
-            {s}%
+            {seg.end}%
           </span>
         ))}
       </div>
