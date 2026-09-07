@@ -13,13 +13,21 @@ export const movementTypeSchema = z.enum(["deposit", "withdrawal"]);
 const goalFields = {
   name: z.string().trim().min(1, "Nombre requerido").max(120),
   description: z.string().trim().max(500, "Máximo 500 caracteres").optional().nullable(),
-  targetAmount: z.number().int("Monto inválido").positive("Monto objetivo debe ser mayor a 0"),
+  targetAmount: z
+    .number({ message: "Monto inválido" })
+    .int("Monto inválido")
+    .positive("Monto inválido"),
   startDate: dateString,
   dateMode: dateModeSchema,
   targetDate: optionalDate.optional().nullable(),
   planningMode: planningModeSchema,
   periodicity: periodicitySchema.optional().nullable(),
-  plannedAmount: z.number().int("Monto inválido").positive("Monto planificado debe ser mayor a 0").optional().nullable(),
+  plannedAmount: z
+    .number({ message: "Monto inválido" })
+    .int("Monto inválido")
+    .positive("Monto inválido")
+    .optional()
+    .nullable(),
   category: categorySchema,
 };
 

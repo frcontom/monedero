@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { formatMoney } from "@/lib/money";
 import { formatDate } from "@/lib/dates";
+import { MoneyInput } from "@/components/ui/currency-input";
 import { useDeleteMovement, useUpdateMovement } from "@/lib/client/hooks";
 import type { Movement } from "@/lib/types";
 
@@ -33,14 +34,14 @@ export function MovementRow({ goalId, movement }: { goalId: string; movement: Mo
   };
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-3">
+    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3">
       {!editing ? (
         <div className="flex items-center justify-between gap-2">
           <div className="min-w-0">
-            <p className={`font-semibold ${isDeposit ? "text-emerald-700" : "text-red-700"}`}>
+            <p className={`font-semibold ${isDeposit ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400"}`}>
               {isDeposit ? "+" : "−"} {formatMoney(movement.amount)}
             </p>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               {formatDate(movement.date)}
               {movement.description ? ` · ${movement.description}` : ""}
             </p>
@@ -48,13 +49,13 @@ export function MovementRow({ goalId, movement }: { goalId: string; movement: Mo
           <div className="flex shrink-0 gap-1">
             <button
               onClick={() => setEditing(true)}
-              className="rounded-lg px-2 py-1 text-xs text-slate-500 hover:bg-slate-100"
+              className="rounded-lg px-2 py-1 text-xs text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
             >
               Editar
             </button>
             <button
               onClick={() => del.mutate(movement.id, { onError: (e) => setError(e.message) })}
-              className="rounded-lg px-2 py-1 text-xs text-red-600 hover:bg-red-50"
+              className="rounded-lg px-2 py-1 text-xs text-red-600 dark:text-red-400 hover:bg-red-50 dark:bg-red-950"
             >
               Eliminar
             </button>
@@ -66,31 +67,30 @@ export function MovementRow({ goalId, movement }: { goalId: string; movement: Mo
             <select
               value={type}
               onChange={(e) => setType(e.target.value as "deposit" | "withdrawal")}
-              className="rounded-lg border border-slate-300 px-2 py-1.5 text-sm"
+              className="rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2 py-1.5 text-sm"
             >
               <option value="deposit">Aporte</option>
               <option value="withdrawal">Retiro</option>
             </select>
-            <input
-              type="number"
+            <MoneyInput
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="w-28 rounded-lg border border-slate-300 px-2 py-1.5 text-sm"
+              onValueChange={(value) => setAmount(value ?? "")}
+              className="w-32 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2 py-1.5 text-sm"
             />
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="rounded-lg border border-slate-300 px-2 py-1.5 text-sm"
+              className="rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2 py-1.5 text-sm"
             />
           </div>
           <input
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Descripción"
-            className="rounded-lg border border-slate-300 px-2 py-1.5 text-sm"
+            className="rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2 py-1.5 text-sm"
           />
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
           <div className="flex gap-2">
             <button
               onClick={save}
@@ -101,7 +101,7 @@ export function MovementRow({ goalId, movement }: { goalId: string; movement: Mo
             </button>
             <button
               onClick={() => setEditing(false)}
-              className="rounded-lg bg-slate-100 px-3 py-1.5 text-sm text-slate-600"
+              className="rounded-lg bg-slate-100 dark:bg-slate-800 px-3 py-1.5 text-sm text-slate-600 dark:text-slate-400"
             >
               Cancelar
             </button>

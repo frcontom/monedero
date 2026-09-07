@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Modal } from "@/components/ui/modal";
+import { MoneyInput } from "@/components/ui/currency-input";
 import { goalSchema } from "@/lib/validators/goal";
 import type { GoalInput } from "@/lib/validators/goal";
 import { useCreateGoal, useUpdateGoal } from "@/lib/client/hooks";
@@ -108,9 +109,9 @@ export function GoalModal({ open, onClose, goal }: Props) {
   };
 
   const inputClass =
-    "w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500";
+    "w-full rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500";
   const labelClass = "mb-1 block text-sm font-medium";
-  const errorClass = "mt-1 text-sm text-red-600";
+  const errorClass = "mt-1 text-sm text-red-600 dark:text-red-400";
 
   return (
     <Modal open={open} onClose={onClose} title={isEdit ? "Editar meta" : "Nueva meta"}>
@@ -128,14 +129,20 @@ export function GoalModal({ open, onClose, goal }: Props) {
             <label htmlFor="targetAmount" className={labelClass}>
               Monto objetivo ($)
             </label>
-            <input
-              id="targetAmount"
-              type="number"
-              inputMode="numeric"
-              min={1}
-              className={inputClass}
-              placeholder="Ej. 5000000"
-              {...register("targetAmount", { setValueAs: (v) => (v === "" ? Number.NaN : Number(v)) })}
+            <Controller
+              control={control}
+              name="targetAmount"
+              render={({ field }) => (
+                <MoneyInput
+                  id="targetAmount"
+                  className={inputClass}
+                  placeholder="Ej. 5.000.000"
+                  value={field.value ?? undefined}
+                  onValueChange={(value) =>
+                    field.onChange(value === undefined ? undefined : Number(value))
+                  }
+                />
+              )}
             />
             {errors.targetAmount && <p className={errorClass}>{errors.targetAmount.message}</p>}
           </div>
@@ -151,7 +158,7 @@ export function GoalModal({ open, onClose, goal }: Props) {
         <div>
           <span className={labelClass}>Fecha objetivo</span>
           <div className="flex gap-2">
-            <label className="flex flex-1 cursor-pointer items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50">
+            <label className="flex flex-1 cursor-pointer items-center gap-2 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-2 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 dark:has-[:checked]:bg-blue-950">
               <input
                 type="radio"
                 value="TARGET_DATE"
@@ -160,7 +167,7 @@ export function GoalModal({ open, onClose, goal }: Props) {
               />
               <span className="text-sm">Con fecha</span>
             </label>
-            <label className="flex flex-1 cursor-pointer items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50">
+            <label className="flex flex-1 cursor-pointer items-center gap-2 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-2 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 dark:has-[:checked]:bg-blue-950">
               <input
                 type="radio"
                 value="NO_DATE"
@@ -185,7 +192,7 @@ export function GoalModal({ open, onClose, goal }: Props) {
         <div>
           <span className={labelClass}>Plan de aportes</span>
           <div className="flex gap-2">
-            <label className="flex flex-1 cursor-pointer items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50">
+            <label className="flex flex-1 cursor-pointer items-center gap-2 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-2 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 dark:has-[:checked]:bg-blue-950">
               <input
                 type="radio"
                 value="PERIODIC"
@@ -194,7 +201,7 @@ export function GoalModal({ open, onClose, goal }: Props) {
               />
               <span className="text-sm">Periódico</span>
             </label>
-            <label className="flex flex-1 cursor-pointer items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50">
+            <label className="flex flex-1 cursor-pointer items-center gap-2 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-2 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 dark:has-[:checked]:bg-blue-950">
               <input
                 type="radio"
                 value="FLEXIBLE"
@@ -225,14 +232,20 @@ export function GoalModal({ open, onClose, goal }: Props) {
               <label htmlFor="plannedAmount" className={labelClass}>
                 Monto por periodo ($)
               </label>
-              <input
-                id="plannedAmount"
-                type="number"
-                inputMode="numeric"
-                min={1}
-                className={inputClass}
-                placeholder="Ej. 500000"
-                {...register("plannedAmount", { setValueAs: (v) => (v === "" ? undefined : Number(v)) })}
+              <Controller
+                control={control}
+                name="plannedAmount"
+                render={({ field }) => (
+                  <MoneyInput
+                    id="plannedAmount"
+                    className={inputClass}
+                    placeholder="Ej. 500.000"
+                    value={field.value ?? undefined}
+                    onValueChange={(value) =>
+                      field.onChange(value === undefined ? undefined : Number(value))
+                    }
+                  />
+                )}
               />
               {errors.plannedAmount && <p className={errorClass}>{errors.plannedAmount.message}</p>}
             </div>
@@ -264,8 +277,8 @@ export function GoalModal({ open, onClose, goal }: Props) {
           />
         </div>
 
-        {formError && <p className="text-sm text-red-600">{formError}</p>}
-        {mutation.isError && <p className="text-sm text-red-600">{mutation.error.message}</p>}
+        {formError && <p className="text-sm text-red-600 dark:text-red-400">{formError}</p>}
+        {mutation.isError && <p className="text-sm text-red-600 dark:text-red-400">{mutation.error.message}</p>}
 
         <button
           type="submit"
