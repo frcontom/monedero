@@ -120,21 +120,29 @@ export function GoalDetailView({ goalId }: { goalId: string }) {
                 Reanudar
               </button>
             )}
-            <button
-              onClick={() => {
-                if (window.confirm("¿Eliminar esta meta por completo? No se puede deshacer.")) {
-                  deleteGoal.mutate(goalId, {
-                    onSuccess: () => router.push("/metas"),
-                    onError: (e) => setActionError(e.message),
-                  });
-                }
-              }}
-              className="rounded-lg border border-red-200 dark:border-red-900 px-3 py-1.5 text-sm font-medium text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950"
-            >
-              🗑 Eliminar meta
-            </button>
+            {isDone && (
+              <button onClick={() => runStatus("ACTIVE")} className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700">
+                Reabrir
+              </button>
+            )}
           </div>
         )}
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            onClick={() => {
+              if (window.confirm("¿Eliminar esta meta por completo? No se puede deshacer.")) {
+                deleteGoal.mutate(goalId, {
+                  onSuccess: () => router.push("/metas"),
+                  onError: (e) => setActionError(e.message),
+                });
+              }
+            }}
+            className="rounded-lg border border-red-200 dark:border-red-900 px-3 py-1.5 text-sm font-medium text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950"
+          >
+            🗑 Eliminar meta
+          </button>
+        </div>
         {actionError && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{actionError}</p>}
       </div>
 
