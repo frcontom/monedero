@@ -7,6 +7,8 @@ Definir el frontend (propuesta REQ-20260906-001, ADR-001/006).
 ## Relevant Information
 
 - Next.js 15 App Router + React 19 + TypeScript; Tailwind CSS; mobile-first.
+- **Tema oscuro**: clase `.dark` en `<html>` (script inline anti-FOUC + `ThemeToggle` con localStorage y `prefers-color-scheme`). Variante Tailwind `dark:` vía `@custom-variant` en `globals.css`. Base colors en variables CSS (`--background`/`--foreground`).
+- **Inputs de dinero**: `MoneyInput` (`react-currency-input-field`) con `intlConfig` es-CO/COP, sin decimales; se usa con React Hook Form `Controller` en GoalModal/MovementForm/MovementRow. El valor en estado es un entero (COP) o `undefined`; nunca `NaN`.
 - Navegación: login, dashboard, metas, detalle de meta, journal/calendario, analítica, configuración.
 - Modal reutilizable y dinámico para crear/editar metas (React Hook Form + zod; CLEAR/INVALIDATE de campos dependientes).
 - Gráficas: Recharts (curva de progreso, analítica). Calendario/journal con date-fns, touch-friendly.
