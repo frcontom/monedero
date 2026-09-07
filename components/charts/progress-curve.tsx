@@ -1,6 +1,6 @@
 "use client";
 
-import { addMonths, differenceInCalendarDays, format, parseISO } from "date-fns";
+import { differenceInCalendarDays, format, parseISO } from "date-fns";
 import {
   Line,
   LineChart,
@@ -13,39 +13,63 @@ import { PERIOD_DAYS } from "@/lib/calc/goals";
 import { formatMoney } from "@/lib/money";
 import type { GoalSummary, Movement } from "@/lib/types";
 
+function expectedAt(goal: GoalSummary, start: Date, date: Date): number {
+  if (goal.planningMode === "PERIODIC" && goal.periodicity && goal.plannedAmount) {
+    const periodDays = PERIOD_DAYS[goal.periodicity];
+    const periods = Math.floor(differenceInCalendarDays(date, start) / periodDays);
+    return periods * goal.plannedAmount;
+  }
+  if (goal.targetDate) {
+    const totalDays = Math.max(
+      1,
+      differenceInCalendarDays(parseISO(goal.targetDate), start),
+    );
+    const elapsed = Math.min(Math.max(differenceInCalendarDays(date, start), 0), totalDays);
+    return (goal.targetAmount * elapsed) / totalDays;
+  }
+  return 0;
+}
+
 function buildCurve(goal: GoalSummary, movements: Movement[]) {
   const start = parseISO(goal.startDate);
   const today = new Date();
-  const points: { period: string; actual: number; expected: number }[] = [];
-  let cursor = start;
-  let idx = 0;
 
-  while (cursor <= today && idx < 120) {
-    const dateStr = format(cursor, "yyyy-MM-dd");
+  const dates: Date[] = [start];
+  for (const m of movements) {
+    const p = parseISO(m.date);
+    if (p >= start && p <= today && p.getTime() !== dates[dates.length - 1].getTime()) {
+      dates.push(p);
+    }
+  }
+  if (dates[dates.length - 1].getTime() !== today.getTime()) {
+    dates.push(today);
+  }
+
+  let points = dates.map((date) => {
+    const dateStr = format(date, "yyyy-MM-dd");
     const actual = movements
       .filter((m) => m.date <= dateStr)
       .reduce((s, m) => s + (m.type === "deposit" ? m.amount : -m.amount), 0);
+    return {
+      period: format(date, "dd/MM"),
+      actual,
+      expected: expectedAt(goal, start, date),
+    };
+  });
 
-    let expected = 0;
-    if (goal.planningMode === "PERIODIC" && goal.periodicity && goal.plannedAmount) {
-      const periodDays = PERIOD_DAYS[goal.periodicity];
-      const periods = Math.floor(differenceInCalendarDays(cursor, start) / periodDays);
-      expected = periods * goal.plannedAmount;
-    } else if (goal.targetDate) {
-      const totalDays = Math.max(
-        1,
-        differenceInCalendarDays(parseISO(goal.targetDate), start),
-      );
-      const elapsed = Math.min(
-        Math.max(differenceInCalendarDays(cursor, start), 0),
-        totalDays,
-      );
-      expected = (goal.targetAmount * elapsed) / totalDays;
+  if (points.length > 60) {
+    const step = Math.ceil(points.length / 60);
+    points = points.filter((_, i) => i % step === 0);
+    if (points[points.length - 1].period !== format(today, "dd/MM")) {
+      points.push({
+        period: format(today, "dd/MM"),
+        actual: movements.reduce(
+          (s, m) => s + (m.type === "deposit" ? m.amount : -m.amount),
+          0,
+        ),
+        expected: expectedAt(goal, start, today),
+      });
     }
-
-    points.push({ period: format(cursor, "MMM yy"), actual, expected });
-    cursor = addMonths(cursor, 1);
-    idx++;
   }
 
   return points;
@@ -67,12 +91,12 @@ export function ProgressCurve({
           <XAxis dataKey="period" tick={{ fontSize: 11 }} />
           <YAxis
             tick={{ fontSize: 11 }}
-            tickFormatter={(v: number) => `${Math.round(v / 1000)}k`}
+            tickFormatter={(v: number) => `${Math.round(Number(v) / 1000)}k`}
             width={44}
           />
           <Tooltip
             formatter={(value) => formatMoney(Math.round(Number(value)))}
-            labelFormatter={(label) => `Periodo: ${label}`}
+            labelFormatter={(label) => `Fecha: ${label}`}
           />
           <Line
             type="monotone"
@@ -80,7 +104,7 @@ export function ProgressCurve({
             name="Real"
             stroke="#2563eb"
             strokeWidth={2}
-            dot={false}
+            dot={{ r: 3 }}
           />
           <Line
             type="monotone"

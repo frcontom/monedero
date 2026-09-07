@@ -39,4 +39,10 @@ test("flujo completo: crear meta y registrar aporte", async ({ page }) => {
   await page.getByLabel("Monto ($)").fill("500000");
   await page.getByRole("button", { name: "Registrar aporte" }).click();
   await expect(page.getByText("+ $ 500.000").first()).toBeVisible();
+
+  // limpieza: cancelar la meta creada por el test
+  const goalId = page.url().split("/").pop()!;
+  await page.evaluate(async (id) => {
+    await fetch(`/api/goals/${id}`, { method: "DELETE" });
+  }, goalId);
 });
