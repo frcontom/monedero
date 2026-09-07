@@ -34,16 +34,14 @@ function buildCurve(goal: GoalSummary, movements: Movement[]) {
   const start = parseISO(goal.startDate);
   const today = new Date();
 
-  const dates: Date[] = [start];
+  const dateSet = new Set<number>([start.getTime()]);
   for (const m of movements) {
     const p = parseISO(m.date);
-    if (p >= start && p <= today && p.getTime() !== dates[dates.length - 1].getTime()) {
-      dates.push(p);
-    }
+    if (p >= start && p <= today) dateSet.add(p.getTime());
   }
-  if (dates[dates.length - 1].getTime() !== today.getTime()) {
-    dates.push(today);
-  }
+  dateSet.add(today.getTime());
+
+  const dates = [...dateSet].sort((a, b) => a - b).map((t) => new Date(t));
 
   let points = dates.map((date) => {
     const dateStr = format(date, "yyyy-MM-dd");

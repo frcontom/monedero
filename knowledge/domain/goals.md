@@ -117,7 +117,7 @@ Mensajes accionables (data-driven, BR-012):
 ## 7. Políticas de datos
 
 - **Movimientos**: se pueden **editar** (fecha, tipo, monto, descripción) y **eliminar** (corrección de hechos personales). No se alteran automáticamente al modificar la meta (BR-005). Timestamps `created_at`/`updated_at`.
-- **Metas**: **no se eliminan físicamente** (soft): se cancelan (`CANCELADA`) para preservar historial e integridad referencial.
+- **Metas**: `DELETE /api/goals/[id]` **elimina por completo** la meta y sus movimientos (FK en cascada). No se puede deshacer. El estado `CANCELLED` se usa solo como estado administrativo/archivo explícito (pausa definitiva sin borrar), no como borrado.
 - **Modificación de meta**: cambiar objetivo/fechas/plan no reescribe movimientos; recalcula solo expectativas futuras con la configuración vigente.
 
 ## 8. Configuración funcional de la meta (campos)

@@ -6,6 +6,7 @@ import { formatMoney } from "@/lib/money";
 import { formatDate } from "@/lib/dates";
 import { useDashboard, useGoals } from "@/lib/client/hooks";
 import { GoalModal } from "@/components/goals/goal-modal";
+import { GoalCard } from "@/components/goals/goal-card";
 import {
   PERFORMANCE_COLOR,
   PERFORMANCE_LABEL,
@@ -103,6 +104,26 @@ export function DashboardView() {
           </div>
         </div>
       )}
+
+      <div>
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="font-semibold">Tus metas</h2>
+          <Link href="/metas" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
+            Ver todas →
+          </Link>
+        </div>
+        {(goals.data?.goals.filter((g) => g.status !== "CANCELLED") ?? []).length === 0 ? (
+          <p className="rounded-2xl border border-dashed border-slate-300 dark:border-slate-600 p-6 text-center text-slate-500 dark:text-slate-400">
+            Aún no tienes metas. Crea la primera para empezar a ahorrar.
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            {goals.data?.goals
+              .filter((g) => g.status !== "CANCELLED")
+              .map((g) => <GoalCard key={g.id} goal={g} />)}
+          </div>
+        )}
+      </div>
 
       <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
         <h2 className="mb-2 font-semibold">Actividad reciente</h2>

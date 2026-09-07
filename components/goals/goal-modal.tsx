@@ -137,7 +137,7 @@ export function GoalModal({ open, onClose, goal }: Props) {
                   id="targetAmount"
                   className={inputClass}
                   placeholder="Ej. 5.000.000"
-                  value={field.value ?? undefined}
+                  value={typeof field.value === "number" && Number.isFinite(field.value) ? field.value : undefined}
                   onValueChange={(value) =>
                     field.onChange(value === undefined ? undefined : Number(value))
                   }
@@ -240,7 +240,7 @@ export function GoalModal({ open, onClose, goal }: Props) {
                     id="plannedAmount"
                     className={inputClass}
                     placeholder="Ej. 500.000"
-                    value={field.value ?? undefined}
+                    value={typeof field.value === "number" && Number.isFinite(field.value) ? field.value : undefined}
                     onValueChange={(value) =>
                       field.onChange(value === undefined ? undefined : Number(value))
                     }

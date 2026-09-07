@@ -43,7 +43,7 @@ export const api = {
       body: JSON.stringify({ status }),
     }).then(handle<{ goal: GoalSummary }>),
   deleteGoal: (id: string) =>
-    fetch(`/api/goals/${id}`, { method: "DELETE" }).then(handle<{ goal: GoalSummary }>),
+    fetch(`/api/goals/${id}`, { method: "DELETE" }).then(handle<{ deleted: true }>),
   listMovements: (goalId: string) =>
     fetch(`/api/goals/${goalId}/movements`).then(
       handle<{ movements: Movement[]; total: number }>,

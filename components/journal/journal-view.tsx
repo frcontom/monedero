@@ -87,15 +87,19 @@ export function JournalView() {
               <button
                 key={dateStr}
                 onClick={() => setSelected(isSelected ? null : dateStr)}
-                className={`flex h-12 flex-col items-center justify-center rounded-lg text-sm transition md:h-14 ${
+                className={`flex h-16 flex-col items-center justify-center gap-0.5 rounded-lg px-0.5 text-sm transition md:h-20 ${
                   !inMonth ? "text-slate-300" : isSelected ? "bg-blue-600 text-white" : "hover:bg-slate-100 dark:hover:bg-slate-700"
                 }`}
               >
-                <span className="font-medium">{format(day, "d")}</span>
+                <span className="text-base font-semibold md:text-lg">{format(day, "d")}</span>
                 {entries.length > 0 && (
-                  <span className={`text-[10px] leading-none ${isSelected ? "text-white" : net >= 0 ? "text-emerald-600" : "text-red-600 dark:text-red-400"}`}>
-                    {net >= 0 ? "+" : ""}
-                    {Math.round(net / 1000)}k
+                  <span
+                    className={`w-full truncate text-center text-[11px] leading-none md:text-xs ${
+                      isSelected ? "text-white" : net >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"
+                    }`}
+                  >
+                    {net >= 0 ? "+" : "−"}
+                    {formatMoney(Math.abs(net))}
                   </span>
                 )}
               </button>

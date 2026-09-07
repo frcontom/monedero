@@ -178,14 +178,13 @@ export async function setGoalStatus(
   return updated;
 }
 
-export async function softDeleteGoal(userId: string, goalId: string): Promise<Goal> {
-  const [updated] = await db
-    .update(goals)
-    .set({ status: "CANCELLED", updatedAt: new Date() })
+export async function deleteGoal(userId: string, goalId: string) {
+  const result = await db
+    .delete(goals)
     .where(and(eq(goals.id, goalId), eq(goals.userId, userId)))
-    .returning();
-  if (!updated) throw new ApiError(404, "NOT_FOUND", "Meta no encontrada");
-  return updated;
+    .returning({ id: goals.id });
+  if (result.length === 0) throw new ApiError(404, "NOT_FOUND", "Meta no encontrada");
+  return true;
 }
 
 export async function listMovements(

@@ -49,7 +49,8 @@ Regla: `COMPLETED` solo si `accumulated >= targetAmount` (si no → `400 COMPLET
 `200` → `{ goal: GoalSummary }`.
 
 ### `DELETE /api/goals/[id]`
-Soft delete → estado `CANCELLED` (se conserva historial). `200` → `{ goal: GoalSummary }`.
+Elimina **por completo** la meta y sus movimientos (no reversible).
+`200` → `{ deleted: true }`. `404` si no existe o no es del usuario.
 
 ## Movements
 

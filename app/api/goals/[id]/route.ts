@@ -1,6 +1,6 @@
 import { runApi, json, parseBody } from "@/lib/http";
 import { requireUserId } from "@/lib/session";
-import { getGoalDetail, updateGoal, softDeleteGoal } from "@/lib/repo/goals";
+import { getGoalDetail, updateGoal, deleteGoal } from "@/lib/repo/goals";
 import { goalSchema } from "@/lib/validators/goal";
 
 export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
@@ -26,7 +26,7 @@ export async function DELETE(_request: Request, context: { params: Promise<{ id:
   return runApi(async () => {
     const { id } = await context.params;
     const userId = await requireUserId();
-    const goal = await softDeleteGoal(userId, id);
-    return json({ goal });
+    await deleteGoal(userId, id);
+    return json({ deleted: true });
   });
 }

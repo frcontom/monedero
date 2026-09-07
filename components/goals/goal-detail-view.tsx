@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { formatMoney } from "@/lib/money";
 import { formatDate } from "@/lib/dates";
 import {
@@ -22,6 +23,7 @@ import { MovementHistory } from "@/components/goals/movement-history";
 import { ProgressCurve } from "@/components/charts/progress-curve";
 
 export function GoalDetailView({ goalId }: { goalId: string }) {
+  const router = useRouter();
   const { data, isLoading, isError, error } = useGoal(goalId);
   const projection = useProjection(goalId);
   const setStatus = useSetStatus();
@@ -115,8 +117,11 @@ export function GoalDetailView({ goalId }: { goalId: string }) {
             )}
             <button
               onClick={() => {
-                if (window.confirm("¿Eliminar esta meta? El historial se conserva y se marcará como cancelada.")) {
-                  deleteGoal.mutate(goalId, { onError: (e) => setActionError(e.message) });
+                if (window.confirm("¿Eliminar esta meta por completo? No se puede deshacer.")) {
+                  deleteGoal.mutate(goalId, {
+                    onSuccess: () => router.push("/metas"),
+                    onError: (e) => setActionError(e.message),
+                  });
                 }
               }}
               className="rounded-lg border border-red-200 dark:border-red-900 px-3 py-1.5 text-sm font-medium text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950"
