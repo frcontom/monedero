@@ -50,10 +50,10 @@ export function LoginForm() {
           id="email"
           type="email"
           autoComplete="email"
-          className="rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           {...register("email")}
         />
-        {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
+        {errors.email && <p className="text-sm text-red-600 dark:text-red-400">{errors.email.message}</p>}
       </div>
 
       <div className="flex flex-col gap-1">
@@ -64,13 +64,13 @@ export function LoginForm() {
           id="password"
           type="password"
           autoComplete="current-password"
-          className="rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           {...register("password")}
         />
-        {errors.password && <p className="text-sm text-red-600">{errors.password.message}</p>}
+        {errors.password && <p className="text-sm text-red-600 dark:text-red-400">{errors.password.message}</p>}
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
       <button
         type="submit"

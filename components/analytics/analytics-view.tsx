@@ -43,7 +43,7 @@ export function AnalyticsView() {
         <select
           value={effectiveGoalId}
           onChange={(e) => setGoalId(e.target.value)}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2"
+          className="w-full rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-2"
         >
           {(goals.data?.goals ?? []).map((g) => (
             <option key={g.id} value={g.id}>
@@ -53,16 +53,16 @@ export function AnalyticsView() {
         </select>
       </div>
 
-      {goals.isLoading && <p className="text-sm text-slate-500">Cargando…</p>}
+      {goals.isLoading && <p className="text-sm text-slate-500 dark:text-slate-400">Cargando…</p>}
       {goals.data && goals.data.goals.length === 0 && (
-        <p className="rounded-2xl border border-dashed border-slate-300 p-6 text-center text-slate-500">
+        <p className="rounded-2xl border border-dashed border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 p-6 text-center text-slate-500 dark:text-slate-400">
           Crea una meta para ver analítica.
         </p>
       )}
 
       {selectedGoal && data.data && (
         <>
-          <Link href={`/metas/${selectedGoal.id}`} className="text-sm text-blue-600 hover:underline">
+          <Link href={`/metas/${selectedGoal.id}`} className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
             Ver detalle de {selectedGoal.name} →
           </Link>
 
@@ -73,17 +73,17 @@ export function AnalyticsView() {
               { label: "Días con actividad", value: String(data.data.frequency.daysWithActivity) },
               { label: "Aportes / Retiros", value: `${data.data.frequency.deposits} / ${data.data.frequency.withdrawals}` },
             ].map((c) => (
-              <div key={c.label} className="rounded-2xl border border-slate-200 bg-white p-4">
-                <p className="text-xs text-slate-500">{c.label}</p>
+              <div key={c.label} className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
+                <p className="text-xs text-slate-500 dark:text-slate-400">{c.label}</p>
                 <p className="mt-1 font-semibold">{c.value}</p>
               </div>
             ))}
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-4">
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
             <h2 className="mb-3 font-semibold">Aportes por mes</h2>
             {data.data.contributions.length === 0 ? (
-              <p className="text-sm text-slate-500">Sin movimientos todavía.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Sin movimientos todavía.</p>
             ) : (
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
@@ -108,7 +108,7 @@ export function AnalyticsView() {
           </div>
 
           {data.data.planVsActual.points.length > 0 && (
-            <div className="rounded-2xl border border-slate-200 bg-white p-4">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
               <h2 className="mb-3 font-semibold">Plan vs real</h2>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">

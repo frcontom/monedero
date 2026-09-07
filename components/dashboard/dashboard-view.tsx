@@ -16,7 +16,7 @@ export function DashboardView() {
   const goals = useGoals();
   const [modalOpen, setModalOpen] = useState(false);
 
-  if (isLoading) return <p className="text-slate-500">Cargando…</p>;
+  if (isLoading) return <p className="text-slate-500 dark:text-slate-400">Cargando…</p>;
   if (!data) return null;
 
   const nameOf = new Map(goals.data?.goals.map((g) => [g.id, g.name]) ?? []);
@@ -36,9 +36,9 @@ export function DashboardView() {
 
   const perfCards = [
     { label: "Alcanzadas", value: data.performance.achieved, color: "text-blue-700" },
-    { label: "En ritmo", value: data.performance.onTrack, color: "text-emerald-700" },
+    { label: "En ritmo", value: data.performance.onTrack, color: "text-emerald-700 dark:text-emerald-400" },
     { label: "Necesitan atención", value: data.performance.needsAttention, color: "text-amber-700" },
-    { label: "Atrasadas", value: data.performance.behind, color: "text-red-700" },
+    { label: "Atrasadas", value: data.performance.behind, color: "text-red-700 dark:text-red-400" },
   ];
 
   return (
@@ -55,19 +55,19 @@ export function DashboardView() {
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {totalsCards.map((c) => (
-          <div key={c.label} className="rounded-2xl border border-slate-200 bg-white p-4">
-            <p className="text-xs text-slate-500">{c.label}</p>
+          <div key={c.label} className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
+            <p className="text-xs text-slate-500 dark:text-slate-400">{c.label}</p>
             <p className="mt-1 font-semibold">{c.value}</p>
           </div>
         ))}
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-4">
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
         <div className="mb-2 flex items-center justify-between">
           <h2 className="font-semibold">Progreso global</h2>
           <span className="text-sm font-medium">{Math.round(data.totals.progressPct)}%</span>
         </div>
-        <div className="h-3 w-full overflow-hidden rounded-full bg-slate-100">
+        <div className="h-3 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
           <div
             className="h-full rounded-full bg-blue-600"
             style={{ width: `${Math.min(100, data.totals.progressPct)}%` }}
@@ -77,22 +77,22 @@ export function DashboardView() {
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {perfCards.map((c) => (
-          <div key={c.label} className="rounded-2xl border border-slate-200 bg-white p-3">
+          <div key={c.label} className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3">
             <p className={`text-2xl font-bold ${c.color}`}>{c.value}</p>
-            <p className="text-xs text-slate-500">{c.label}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">{c.label}</p>
           </div>
         ))}
       </div>
 
       {attentionGoals.length > 0 && (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
-          <h2 className="mb-2 font-semibold text-amber-900">Requieren atención</h2>
+        <div className="rounded-2xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950 p-4">
+          <h2 className="mb-2 font-semibold text-amber-900 dark:text-amber-200">Requieren atención</h2>
           <div className="flex flex-col gap-2">
             {attentionGoals.map((g) => (
               <Link
                 key={g.id}
                 href={`/metas/${g.id}`}
-                className="flex items-center justify-between rounded-xl bg-white px-3 py-2 text-sm"
+                className="flex items-center justify-between rounded-xl bg-white dark:bg-slate-900 px-3 py-2 text-sm"
               >
                 <span className="font-medium">{g.name}</span>
                 <span className={`rounded-full px-2 py-0.5 text-xs ${PERFORMANCE_COLOR[g.performanceStatus]}`}>
@@ -104,19 +104,19 @@ export function DashboardView() {
         </div>
       )}
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-4">
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
         <h2 className="mb-2 font-semibold">Actividad reciente</h2>
         {data.recentActivity.length === 0 ? (
-          <p className="text-sm text-slate-500">Sin movimientos recientes.</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Sin movimientos recientes.</p>
         ) : (
           <div className="flex flex-col gap-2">
             {data.recentActivity.map((m) => (
-              <div key={m.id} className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2 text-sm">
+              <div key={m.id} className="flex items-center justify-between rounded-xl bg-slate-50 dark:bg-slate-800 px-3 py-2 text-sm">
                 <div className="min-w-0">
                   <p className="truncate font-medium">{nameOf.get(m.goalId) ?? "Meta"}</p>
-                  <p className="text-xs text-slate-500">{formatDate(m.date)}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{formatDate(m.date)}</p>
                 </div>
-                <span className={`font-semibold ${m.type === "deposit" ? "text-emerald-700" : "text-red-700"}`}>
+                <span className={`font-semibold ${m.type === "deposit" ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400"}`}>
                   {m.type === "deposit" ? "+" : "−"} {formatMoney(m.amount)}
                 </span>
               </div>

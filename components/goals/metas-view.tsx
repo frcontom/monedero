@@ -21,11 +21,11 @@ export function MetasView() {
         </button>
       </div>
 
-      {isLoading && <p className="text-slate-500">Cargando…</p>}
-      {isError && <p className="text-red-600">Error: {error.message}</p>}
+      {isLoading && <p className="text-slate-500 dark:text-slate-400">Cargando…</p>}
+      {isError && <p className="text-red-600 dark:text-red-400">Error: {error.message}</p>}
 
       {data && data.goals.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-slate-300 p-8 text-center text-slate-500">
+        <div className="rounded-2xl border border-dashed border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 p-8 text-center text-slate-500 dark:text-slate-400">
           Aún no tienes metas. Crea la primera para empezar a ahorrar.
         </div>
       )}
