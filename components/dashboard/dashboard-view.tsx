@@ -117,7 +117,7 @@ export function DashboardView() {
             Aún no tienes metas. Crea la primera para empezar a ahorrar.
           </p>
         ) : (
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <div className="flex flex-col gap-3">
             {goals.data?.goals
               .filter((g) => g.status !== "CANCELLED")
               .map((g) => <GoalCard key={g.id} goal={g} />)}
