@@ -76,12 +76,51 @@ export function GoalDetailView({ goalId }: { goalId: string }) {
             </p>
             {goal.description && <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{goal.description}</p>}
           </div>
-          <button
-            onClick={() => setEditOpen(true)}
-            className="shrink-0 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-1.5 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-700"
-          >
-            Editar
-          </button>
+          <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+            {!isDone && (
+              <>
+                {isActive && (
+                  <>
+                    <button onClick={() => runStatus("PAUSED")} className="rounded-lg bg-slate-100 dark:bg-slate-800 px-3 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600">
+                      Pausar
+                    </button>
+                    <button onClick={() => runStatus("COMPLETED")} className="rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700">
+                      Completar
+                    </button>
+                  </>
+                )}
+                {isPaused && (
+                  <button onClick={() => runStatus("ACTIVE")} className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700">
+                    Reanudar
+                  </button>
+                )}
+              </>
+            )}
+            {isDone && (
+              <button onClick={() => runStatus("ACTIVE")} className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700">
+                Reabrir
+              </button>
+            )}
+            <button
+              onClick={() => setEditOpen(true)}
+              className="rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-1.5 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-700"
+            >
+              Editar
+            </button>
+            <button
+              onClick={() => {
+                if (window.confirm("¿Eliminar esta meta por completo? No se puede deshacer.")) {
+                  deleteGoal.mutate(goalId, {
+                    onSuccess: () => router.push("/metas"),
+                    onError: (e) => setActionError(e.message),
+                  });
+                }
+              }}
+              className="rounded-lg border border-red-200 dark:border-red-900 px-3 py-1.5 text-sm font-medium text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950"
+            >
+              🗑 Eliminar
+            </button>
+          </div>
         </div>
 
         <div className="mt-3 flex flex-wrap gap-2">
@@ -101,47 +140,6 @@ export function GoalDetailView({ goalId }: { goalId: string }) {
 
         <div className="mt-4">
           <ProgressBar pct={goal.progressPct} />
-        </div>
-
-        {!isDone && (
-          <div className="mt-4 flex flex-wrap gap-2">
-            {isActive && (
-              <>
-                <button onClick={() => runStatus("PAUSED")} className="rounded-lg bg-slate-100 dark:bg-slate-800 px-3 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600">
-                  Pausar
-                </button>
-                <button onClick={() => runStatus("COMPLETED")} className="rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700">
-                  Completar
-                </button>
-              </>
-            )}
-            {isPaused && (
-              <button onClick={() => runStatus("ACTIVE")} className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700">
-                Reanudar
-              </button>
-            )}
-            {isDone && (
-              <button onClick={() => runStatus("ACTIVE")} className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700">
-                Reabrir
-              </button>
-            )}
-          </div>
-        )}
-
-        <div className="mt-4 flex flex-wrap gap-2">
-          <button
-            onClick={() => {
-              if (window.confirm("¿Eliminar esta meta por completo? No se puede deshacer.")) {
-                deleteGoal.mutate(goalId, {
-                  onSuccess: () => router.push("/metas"),
-                  onError: (e) => setActionError(e.message),
-                });
-              }
-            }}
-            className="rounded-lg border border-red-200 dark:border-red-900 px-3 py-1.5 text-sm font-medium text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950"
-          >
-            🗑 Eliminar meta
-          </button>
         </div>
         {actionError && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{actionError}</p>}
       </div>
