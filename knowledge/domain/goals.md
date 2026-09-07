@@ -59,7 +59,9 @@ projected_date = today + proj_days
 - Si `avg_daily_rate <= 0` o no hay movimientos → **sin datos suficientes** (no se muestra fecha proyectada).
 - La proyección SIEMPRE se etiqueta como **estimación** basada en comportamiento histórico (BR-011). Nunca como garantía.
 
-### Equivalentes de ritmo necesario (con fecha objetivo)
+### Equivalentes de ritmo necesario (solo con fecha objetivo futura)
+
+El ritmo necesario por día/semana/mes solo tiene sentido cuando existe una **fecha objetivo** (y no ha pasado). Para metas sin fecha (o con fecha ya vencida) **no se calculan** (`null` en la API; la UI muestra "—" y en su lugar el plan por periodo si existe).
 
 ```
 days_left      = max(1, target_d − today)
@@ -67,6 +69,8 @@ rate_daily     = remaining / days_left
 rate_weekly    = rate_daily × 7
 rate_monthly   = rate_daily × 30.4375
 ```
+
+> Antes se usaba `days_left = 1` para metas sin fecha, produciendo valores absurdos (semana ≈ 7× y mes ≈ 30× el restante). Corregido.
 
 ## 5. Estado de rendimiento (disciplina)
 

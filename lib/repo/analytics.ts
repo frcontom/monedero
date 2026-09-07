@@ -115,8 +115,11 @@ export async function getProjection(userId: string, goalId: string): Promise<Pro
   const expected = expectedAccumulated(ref, today);
   const reference = hasReference(ref);
 
-  const daysLeft = goal.targetDate ? daysUntilTarget(goal.targetDate, today) : null;
-  const rates = requiredRates(remainingAmount, daysLeft ?? 1);
+  const hasDeadline = goal.targetDate !== null && goal.targetDate >= today;
+  const daysLeft = hasDeadline ? daysUntilTarget(goal.targetDate as string, today) : null;
+  const rates = hasDeadline && daysLeft !== null
+    ? requiredRates(remainingAmount, daysLeft)
+    : { daily: null, weekly: null, monthly: null };
 
   let projectionDate: string | null = null;
   let projectionBasis: ProjectionData["projectionBasis"] = "NONE";
@@ -168,7 +171,7 @@ export async function getProjection(userId: string, goalId: string): Promise<Pro
       reference,
     }),
     behind,
-    recoveryAmount: behind > 0 ? behind + rates.daily : 0,
+    recoveryAmount: behind > 0 && rates.daily !== null ? behind + rates.daily : 0,
     lastMovementDaysAgo,
   };
 }

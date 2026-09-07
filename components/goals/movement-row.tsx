@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { formatMoney } from "@/lib/money";
-import { formatDate } from "@/lib/dates";
 import { MoneyInput } from "@/components/ui/currency-input";
 import { useDeleteMovement, useUpdateMovement } from "@/lib/client/hooks";
 import type { Movement } from "@/lib/types";
@@ -33,35 +32,9 @@ export function MovementRow({ goalId, movement }: { goalId: string; movement: Mo
     );
   };
 
-  return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3">
-      {!editing ? (
-        <div className="flex items-center justify-between gap-2">
-          <div className="min-w-0">
-            <p className={`font-semibold ${isDeposit ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400"}`}>
-              {isDeposit ? "+" : "−"} {formatMoney(movement.amount)}
-            </p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              {formatDate(movement.date)}
-              {movement.description ? ` · ${movement.description}` : ""}
-            </p>
-          </div>
-          <div className="flex shrink-0 gap-1">
-            <button
-              onClick={() => setEditing(true)}
-              className="rounded-lg px-2 py-1 text-xs text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
-            >
-              Editar
-            </button>
-            <button
-              onClick={() => del.mutate(movement.id, { onError: (e) => setError(e.message) })}
-              className="rounded-lg px-2 py-1 text-xs text-red-600 dark:text-red-400 hover:bg-red-50 dark:bg-red-950"
-            >
-              Eliminar
-            </button>
-          </div>
-        </div>
-      ) : (
+  if (editing) {
+    return (
+      <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3">
         <div className="flex flex-col gap-2">
           <div className="flex gap-2">
             <select
@@ -107,7 +80,49 @@ export function MovementRow({ goalId, movement }: { goalId: string; movement: Mo
             </button>
           </div>
         </div>
-      )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2.5">
+      <div
+        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg font-bold ${
+          isDeposit
+            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400"
+            : "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400"
+        }`}
+      >
+        {isDeposit ? "↑" : "↓"}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className={`font-semibold leading-tight ${isDeposit ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400"}`}>
+          {isDeposit ? "+" : "−"} {formatMoney(movement.amount)}
+        </p>
+        <p className="truncate text-xs text-slate-500 dark:text-slate-400">
+          {movement.description || (isDeposit ? "Aporte" : "Retiro")}
+        </p>
+      </div>
+      <div className="flex shrink-0 gap-0.5">
+        <button
+          onClick={() => setEditing(true)}
+          aria-label="Editar movimiento"
+          className="rounded-lg px-2 py-1 text-sm text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+        >
+          ✎
+        </button>
+        <button
+          onClick={() => {
+            if (window.confirm("¿Eliminar este movimiento?")) {
+              del.mutate(movement.id, { onError: (e) => setError(e.message) });
+            }
+          }}
+          aria-label="Eliminar movimiento"
+          className="rounded-lg px-2 py-1 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950"
+        >
+          🗑
+        </button>
+      </div>
     </div>
   );
 }

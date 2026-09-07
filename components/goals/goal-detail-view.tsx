@@ -18,7 +18,7 @@ import {
 } from "@/components/goals/labels";
 import { GoalModal } from "@/components/goals/goal-modal";
 import { MovementForm } from "@/components/goals/movement-form";
-import { MovementRow } from "@/components/goals/movement-row";
+import { MovementHistory } from "@/components/goals/movement-history";
 import { ProgressCurve } from "@/components/charts/progress-curve";
 
 export function GoalDetailView({ goalId }: { goalId: string }) {
@@ -115,13 +115,13 @@ export function GoalDetailView({ goalId }: { goalId: string }) {
             )}
             <button
               onClick={() => {
-                if (window.confirm("¿Cancelar esta meta? El historial se conserva.")) {
+                if (window.confirm("¿Eliminar esta meta? El historial se conserva y se marcará como cancelada.")) {
                   deleteGoal.mutate(goalId, { onError: (e) => setActionError(e.message) });
                 }
               }}
-              className="rounded-lg bg-red-50 dark:bg-red-950 px-3 py-1.5 text-sm font-medium text-red-700 dark:text-red-400 hover:bg-red-100"
+              className="rounded-lg border border-red-200 dark:border-red-900 px-3 py-1.5 text-sm font-medium text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950"
             >
-              Cancelar
+              🗑 Eliminar meta
             </button>
           </div>
         )}
@@ -131,24 +131,39 @@ export function GoalDetailView({ goalId }: { goalId: string }) {
       {p && (
         <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
           <h2 className="mb-2 font-semibold">Proyección y ritmo</h2>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-            <div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Necesario / día</p>
-              <p className="font-semibold">{formatMoney(Math.round(p.requiredDaily))}</p>
+          {p.requiredDaily !== null ? (
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              <div>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Necesario / día</p>
+                <p className="font-semibold">{formatMoney(Math.round(p.requiredDaily))}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Necesario / semana</p>
+                <p className="font-semibold">{formatMoney(Math.round(p.requiredWeekly ?? 0))}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Necesario / mes</p>
+                <p className="font-semibold">{formatMoney(Math.round(p.requiredMonthly ?? 0))}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Fecha proyectada</p>
+                <p className="font-semibold">{p.projectedDate ? formatDate(p.projectedDate) : "—"}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Necesario / semana</p>
-              <p className="font-semibold">{formatMoney(Math.round(p.requiredWeekly))}</p>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {goal.planningMode === "PERIODIC" && goal.plannedAmount ? (
+                <div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Plan por periodo</p>
+                  <p className="font-semibold">{formatMoney(goal.plannedAmount)}</p>
+                </div>
+              ) : null}
+              <div>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Fecha proyectada</p>
+                <p className="font-semibold">{p.projectedDate ? formatDate(p.projectedDate) : "—"}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Necesario / mes</p>
-              <p className="font-semibold">{formatMoney(Math.round(p.requiredMonthly))}</p>
-            </div>
-            <div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Fecha proyectada</p>
-              <p className="font-semibold">{p.projectedDate ? formatDate(p.projectedDate) : "—"}</p>
-            </div>
-          </div>
+          )}
           <p className="mt-2 text-xs italic text-slate-500 dark:text-slate-400">
             ⓘ {p.explanation} (estimación, no una garantía)
           </p>
@@ -175,17 +190,7 @@ export function GoalDetailView({ goalId }: { goalId: string }) {
 
       <div>
         <h2 className="mb-2 font-semibold">Historial de movimientos</h2>
-        {goal.movements.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 p-6 text-center text-slate-500 dark:text-slate-400">
-            Sin movimientos todavía.
-          </p>
-        ) : (
-          <div className="flex flex-col gap-2">
-            {goal.movements.map((m) => (
-              <MovementRow key={m.id} goalId={goalId} movement={m} />
-            ))}
-          </div>
-        )}
+        <MovementHistory goalId={goalId} movements={goal.movements} />
       </div>
 
       <GoalModal open={editOpen} onClose={() => setEditOpen(false)} goal={goal} />

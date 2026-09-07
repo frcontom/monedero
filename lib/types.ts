@@ -59,9 +59,9 @@ export type DashboardData = {
 
 export type ProjectionData = {
   remaining: number;
-  requiredDaily: number;
-  requiredWeekly: number;
-  requiredMonthly: number;
+  requiredDaily: number | null;
+  requiredWeekly: number | null;
+  requiredMonthly: number | null;
   projectedDate: string | null;
   projectionBasis: "HISTORICAL" | "PLAN" | "NONE";
   estimate: true;
