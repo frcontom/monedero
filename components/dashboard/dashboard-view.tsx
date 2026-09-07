@@ -7,6 +7,7 @@ import { formatDate } from "@/lib/dates";
 import { useDashboard, useGoals } from "@/lib/client/hooks";
 import { GoalModal } from "@/components/goals/goal-modal";
 import { GoalCard } from "@/components/goals/goal-card";
+import { ProgressBar } from "@/components/ui/progress-bar";
 import {
   PERFORMANCE_COLOR,
   PERFORMANCE_LABEL,
@@ -68,12 +69,7 @@ export function DashboardView() {
           <h2 className="font-semibold">Progreso global</h2>
           <span className="text-sm font-medium">{Math.round(data.totals.progressPct)}%</span>
         </div>
-        <div className="h-3 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
-          <div
-            className="h-full rounded-full bg-blue-600"
-            style={{ width: `${Math.min(100, data.totals.progressPct)}%` }}
-          />
-        </div>
+        <ProgressBar pct={data.totals.progressPct} />
       </div>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">

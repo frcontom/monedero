@@ -47,6 +47,7 @@ test("agregar y eliminar movimiento actualiza sin F5", async ({ page }) => {
   expect(await acum()).toContain("602.222");
 
   await page.getByLabel("Monto ($)").fill("500000");
+  await page.getByLabel("Fecha").fill("2026-09-07");
   await page.getByRole("button", { name: "Registrar aporte" }).click();
   await page.waitForTimeout(1200);
   expect(await acum()).toContain("1.102.222");
@@ -54,7 +55,7 @@ test("agregar y eliminar movimiento actualiza sin F5", async ({ page }) => {
   page.on("dialog", (d) => d.accept());
   await page.getByRole("button", { name: "Eliminar movimiento" }).first().click();
   await page.waitForTimeout(1500);
-  expect(await acum()).toContain("752.222");
+  expect(await acum()).toContain("602.222");
 
   await page.evaluate(async (id) => {
     await fetch(`/api/goals/${id}`, { method: "DELETE" });

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { formatMoney } from "@/lib/money";
 import type { GoalSummary } from "@/lib/types";
+import { ProgressBar } from "@/components/ui/progress-bar";
 import { QuickMovementModal } from "@/components/goals/quick-movement";
 import {
   CATEGORY_LABEL,
@@ -49,11 +50,8 @@ export function GoalCard({ goal }: { goal: GoalSummary }) {
           </div>
         </div>
 
-        <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
-          <div
-            className="h-full rounded-full bg-blue-600"
-            style={{ width: `${Math.min(100, goal.progressPct)}%` }}
-          />
+        <div className="mt-3">
+          <ProgressBar pct={goal.progressPct} />
         </div>
 
         <div className="mt-2 flex items-end justify-between text-sm">

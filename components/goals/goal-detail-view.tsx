@@ -20,6 +20,7 @@ import {
 import { GoalModal } from "@/components/goals/goal-modal";
 import { MovementForm } from "@/components/goals/movement-form";
 import { MovementHistory } from "@/components/goals/movement-history";
+import { ProgressBar } from "@/components/ui/progress-bar";
 import { ProgressCurve } from "@/components/charts/progress-curve";
 
 export function GoalDetailView({ goalId }: { goalId: string }) {
@@ -96,6 +97,10 @@ export function GoalDetailView({ goalId }: { goalId: string }) {
               <p className="mt-0.5 font-semibold">{s.value}</p>
             </div>
           ))}
+        </div>
+
+        <div className="mt-4">
+          <ProgressBar pct={goal.progressPct} />
         </div>
 
         {!isDone && (

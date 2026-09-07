@@ -4,6 +4,7 @@ import { differenceInCalendarDays, format, parseISO } from "date-fns";
 import {
   Line,
   LineChart,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -112,6 +113,13 @@ export function ProgressCurve({
             strokeDasharray="4 4"
             strokeWidth={1.5}
             dot={false}
+          />
+          <ReferenceLine
+            y={goal.targetAmount}
+            stroke="#f59e0b"
+            strokeDasharray="8 4"
+            strokeWidth={2}
+            label={{ value: "Objetivo", position: "right", fill: "#f59e0b", fontSize: 12 }}
           />
         </LineChart>
       </ResponsiveContainer>
