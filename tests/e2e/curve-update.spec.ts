@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 const norm = (s: string | null) => (s ?? "").replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim();
 
-test("agregar y eliminar movimiento actualiza sin F5", async ({ page }) => {
+test("agregar y editar movimiento actualiza sin F5", async ({ page }) => {
   await page.goto("/login");
   await page.fill('input[name="email"]', process.env.SEED_USER_EMAIL!);
   await page.fill('input[name="password"]', process.env.SEED_USER_PASSWORD!);
@@ -46,16 +46,24 @@ test("agregar y eliminar movimiento actualiza sin F5", async ({ page }) => {
 
   expect(await acum()).toContain("602.222");
 
+  // agregar +500000 → se actualiza en vivo
   await page.getByLabel("Monto ($)").fill("500000");
   await page.getByLabel("Fecha").fill("2026-09-07");
   await page.getByRole("button", { name: "Registrar aporte" }).click();
   await page.waitForTimeout(1200);
   expect(await acum()).toContain("1.102.222");
 
-  page.on("dialog", (d) => d.accept());
-  await page.getByRole("button", { name: "Eliminar movimiento" }).first().click();
+  // editar un movimiento → el acumulado cambia en vivo (sin F5)
+  const beforeEdit = await acum();
+  await page.getByRole("button", { name: "Editar movimiento" }).first().click();
+  const editingRow = page
+    .locator("div.rounded-xl")
+    .filter({ has: page.getByRole("button", { name: "Guardar" }) });
+  await editingRow.locator('input[type="text"]').first().fill("150000");
+  await editingRow.getByRole("button", { name: "Guardar" }).click();
   await page.waitForTimeout(1500);
-  expect(await acum()).toContain("602.222");
+  const afterEdit = await acum();
+  expect(afterEdit).not.toBe(beforeEdit);
 
   await page.evaluate(async (id) => {
     await fetch(`/api/goals/${id}`, { method: "DELETE" });

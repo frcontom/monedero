@@ -6,6 +6,7 @@ import type {
   Movement,
   ProjectionData,
 } from "@/lib/types";
+import type { Category } from "@/drizzle/schema";
 import type { GoalInput, MovementInput } from "@/lib/validators/goal";
 
 const jsonHeaders = { "Content-Type": "application/json" };
@@ -69,8 +70,47 @@ export const api = {
     fetch(`/api/journal?month=${month}`).then(
       handle<{ entries: { id: string; goalId: string; goalName: string; date: string; type: "deposit" | "withdrawal"; amount: number; description: string | null }[] }>,
     ),
+  journalHeatmap: (weeks = 16) =>
+    fetch(`/api/journal/heatmap?weeks=${weeks}`).then(handle<{ days: { date: string; amount: number }[] }>),
+  categories: () => fetch("/api/categories").then(handle<{ categories: Category[] }>),
+  createCategory: (data: { name: string; color: string; icon: string }) =>
+    fetch("/api/categories", {
+      method: "POST",
+      headers: jsonHeaders,
+      body: JSON.stringify(data),
+    }).then(handle<{ category: Category }>),
+  updateCategory: (id: string, data: { name?: string; color?: string; icon?: string }) =>
+    fetch(`/api/categories/${id}`, {
+      method: "PATCH",
+      headers: jsonHeaders,
+      body: JSON.stringify(data),
+    }).then(handle<{ category: Category }>),
+  deleteCategory: (id: string) =>
+    fetch(`/api/categories/${id}`, { method: "DELETE" }).then(handle<{ deleted: true }>),
   projection: (goalId: string) =>
     fetch(`/api/goals/${goalId}/projection`).then(handle<ProjectionData>),
   analytics: (goalId: string) =>
     fetch(`/api/goals/${goalId}/analytics`).then(handle<AnalyticsData>),
+  categoryAnalytics: () =>
+    fetch("/api/analytics/categories").then(
+      handle<{ categories: { category: string; icon: string; color: string; deposits: number; withdrawals: number; net: number; goalCount: number }[] }>,
+    ),
+  vapidPublicKey: () =>
+    fetch("/api/push/vapid-public-key").then(handle<{ enabled: boolean; key: string | null }>),
+  subscribePush: (sub: PushSubscriptionJSON) =>
+    fetch("/api/push/subscribe", {
+      method: "POST",
+      headers: jsonHeaders,
+      body: JSON.stringify(sub),
+    }).then(handle<{ ok: true }>),
+  unsubscribePush: (endpoint: string) =>
+    fetch("/api/push/subscribe", {
+      method: "DELETE",
+      headers: jsonHeaders,
+      body: JSON.stringify({ endpoint }),
+    }).then(handle<{ ok: true }>),
+  testPush: () =>
+    fetch("/api/push/test", { method: "POST" }).then(
+      handle<{ ok: boolean; message?: string; sent?: number }>,
+    ),
 };

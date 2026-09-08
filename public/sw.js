@@ -51,3 +51,36 @@ self.addEventListener("fetch", (event) => {
       ),
   );
 });
+
+self.addEventListener("push", (event) => {
+  let data = { title: "Monedero", body: "", url: "/dashboard" };
+  try {
+    data = event.data ? JSON.parse(event.data.text()) : data;
+  } catch {
+    /* noop */
+  }
+  event.waitUntil(
+    self.registration.showNotification(data.title || "Monedero", {
+      body: data.body || "",
+      icon: "/icon-192.png",
+      badge: "/icon-192.png",
+      data: { url: data.url || "/dashboard" },
+    }),
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = event.notification.data?.url || "/dashboard";
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
+      for (const client of list) {
+        if ("focus" in client) {
+          client.navigate(url);
+          return client.focus();
+        }
+      }
+      return self.clients.openWindow(url);
+    }),
+  );
+});

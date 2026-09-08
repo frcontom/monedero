@@ -16,8 +16,26 @@ export const dateModeEnum = pgEnum("date_mode", ["TARGET_DATE", "NO_DATE"]);
 export const planningModeEnum = pgEnum("planning_mode", ["PERIODIC", "FLEXIBLE"]);
 export const periodicityEnum = pgEnum("periodicity", ["DAILY", "WEEKLY", "MONTHLY"]);
 export const goalStatusEnum = pgEnum("goal_status", ["ACTIVE", "PAUSED", "COMPLETED", "CANCELLED"]);
-export const categoryEnum = pgEnum("category", ["AHORRO", "COMPRA", "DEUDA", "VIAJE", "FONDO", "OTRO"]);
 export const movementTypeEnum = pgEnum("movement_type", ["deposit", "withdrawal"]);
+
+export const categories = pgTable(
+  "categories",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    color: text("color").notNull().default("#64748b"),
+    icon: text("icon").notNull().default("📌"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [
+    index("categories_user_id_idx").on(t.userId),
+    uniqueIndex("categories_user_name_unique").on(t.userId, t.name),
+  ],
+);
 
 export const users = pgTable(
   "users",
@@ -48,7 +66,7 @@ export const goals = pgTable(
     periodicity: periodicityEnum("periodicity"),
     plannedAmount: bigint("planned_amount", { mode: "number" }),
     status: goalStatusEnum("status").notNull().default("ACTIVE"),
-    category: categoryEnum("category").notNull().default("OTRO"),
+    category: text("category").notNull().default("OTRO"),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
   },
@@ -90,6 +108,25 @@ export const movements = pgTable(
   ],
 );
 
+export const pushSubscriptions = pgTable(
+  "push_subscriptions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    endpoint: text("endpoint").notNull(),
+    p256dh: text("p256dh").notNull(),
+    auth: text("auth").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [
+    index("push_subscriptions_user_id_idx").on(t.userId),
+    uniqueIndex("push_subscriptions_endpoint_unique").on(t.endpoint),
+  ],
+);
+
 export type User = typeof users.$inferSelect;
 export type Goal = typeof goals.$inferSelect;
 export type Movement = typeof movements.$inferSelect;
+export type Category = typeof categories.$inferSelect;

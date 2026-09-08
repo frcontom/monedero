@@ -1,7 +1,7 @@
 import "server-only";
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { goals, movements } from "@/drizzle/schema";
+import { categories, goals, movements } from "@/drizzle/schema";
 import { ApiError } from "@/lib/http";
 import {
   accumulated,
@@ -16,6 +16,7 @@ import {
 import type { Goal, Movement } from "@/drizzle/schema";
 import type { GoalSummary, Movement as MovementDto } from "@/lib/types";
 import type { GoalInput, MovementInput } from "@/lib/validators/goal";
+import { ensureCategory } from "@/lib/repo/categories";
 
 export async function requireOwnedGoal(userId: string, goalId: string): Promise<Goal> {
   const [goal] = await db
@@ -26,6 +27,8 @@ export async function requireOwnedGoal(userId: string, goalId: string): Promise<
   if (!goal) throw new ApiError(404, "NOT_FOUND", "Meta no encontrada");
   return goal;
 }
+
+type GoalWithCategory = Goal & { categoryColor: string | null; categoryIcon: string | null };
 
 async function movementsOf(goalId: string): Promise<Movement[]> {
   return db.select().from(movements).where(eq(movements.goalId, goalId));
@@ -44,7 +47,7 @@ function toDto(mov: Movement): MovementDto {
   };
 }
 
-function buildSummary(goal: Goal, movs: Movement[]): GoalSummary {
+function buildSummary(goal: GoalWithCategory, movs: Movement[]): GoalSummary {
   const acc = accumulated(movs);
   const ref: PlanRef = {
     startDate: goal.startDate,
@@ -70,6 +73,8 @@ function buildSummary(goal: Goal, movs: Movement[]): GoalSummary {
     name: goal.name,
     description: goal.description,
     category: goal.category,
+    categoryColor: goal.categoryColor,
+    categoryIcon: goal.categoryIcon,
     status: goal.status,
     dateMode: goal.dateMode,
     targetDate: goal.targetDate,
@@ -89,12 +94,16 @@ function buildSummary(goal: Goal, movs: Movement[]): GoalSummary {
 
 export async function listGoals(userId: string): Promise<GoalSummary[]> {
   const rows = await db
-    .select()
+    .select({ goal: goals, category: categories })
     .from(goals)
+    .leftJoin(
+      categories,
+      and(eq(categories.userId, goals.userId), eq(categories.name, goals.category)),
+    )
     .where(eq(goals.userId, userId))
     .orderBy(desc(goals.createdAt));
 
-  const ids = rows.map((g) => g.id);
+  const ids = rows.map(({ goal }) => goal.id);
   const allMovements = ids.length
     ? await db.select().from(movements).where(inArray(movements.goalId, ids))
     : [];
@@ -105,16 +114,41 @@ export async function listGoals(userId: string): Promise<GoalSummary[]> {
     byGoal.set(m.goalId, list);
   }
 
-  return rows.map((g) => buildSummary(g, byGoal.get(g.id) ?? []));
+  return rows.map(({ goal, category }) =>
+    buildSummary(
+      {
+        ...goal,
+        categoryColor: category?.color ?? null,
+        categoryIcon: category?.icon ?? null,
+      },
+      byGoal.get(goal.id) ?? [],
+    ),
+  );
 }
 
 export async function getGoalDetail(userId: string, goalId: string) {
-  const goal = await requireOwnedGoal(userId, goalId);
+  const [row] = await db
+    .select({ goal: goals, category: categories })
+    .from(goals)
+    .leftJoin(
+      categories,
+      and(eq(categories.userId, goals.userId), eq(categories.name, goals.category)),
+    )
+    .where(and(eq(goals.id, goalId), eq(goals.userId, userId)))
+    .limit(1);
+  if (!row) throw new ApiError(404, "NOT_FOUND", "Meta no encontrada");
+
+  const goal: GoalWithCategory = {
+    ...row.goal,
+    categoryColor: row.category?.color ?? null,
+    categoryIcon: row.category?.icon ?? null,
+  };
   const movs = await movementsOf(goalId);
   return { summary: buildSummary(goal, movs), movements: movs.map(toDto) };
 }
 
 export async function createGoal(userId: string, data: GoalInput): Promise<Goal> {
+  await ensureCategory(userId, data.category);
   const [goal] = await db
     .insert(goals)
     .values({
@@ -136,6 +170,7 @@ export async function createGoal(userId: string, data: GoalInput): Promise<Goal>
 
 export async function updateGoal(userId: string, goalId: string, data: GoalInput): Promise<Goal> {
   await requireOwnedGoal(userId, goalId);
+  await ensureCategory(userId, data.category);
   const [goal] = await db
     .update(goals)
     .set({

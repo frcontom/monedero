@@ -3,6 +3,7 @@ import {
   accumulated,
   behindAmount,
   byMonth,
+  computeStreaks,
   daysSinceStart,
   daysUntilTarget,
   expectedAccumulated,
@@ -165,6 +166,40 @@ describe("días y déficit", () => {
     expect(behindAmount(30000, 50000)).toBe(0);
     expect(recoveryAmount(20000, 10000)).toBe(30000);
     expect(recoveryAmount(0, 10000)).toBe(0);
+  });
+});
+
+describe("computeStreaks", () => {
+  const today = "2026-09-07";
+
+  it("sin aportes → 0/0", () => {
+    expect(computeStreaks([], today)).toEqual({ current: 0, best: 0 });
+  });
+
+  it("días consecutivos hasta hoy", () => {
+    const dates = ["2026-09-05", "2026-09-06", "2026-09-07"];
+    expect(computeStreaks(dates, today)).toEqual({ current: 3, best: 3 });
+  });
+
+  it("racha actual que termina ayer se conserva", () => {
+    const dates = ["2026-09-04", "2026-09-05", "2026-09-06"];
+    expect(computeStreaks(dates, today)).toEqual({ current: 3, best: 3 });
+  });
+
+  it("racha rota (sin aporte ayer) → actual 0", () => {
+    const dates = ["2026-09-01", "2026-09-02", "2026-09-05"];
+    expect(computeStreaks(dates, today).current).toBe(0);
+    expect(computeStreaks(dates, today).best).toBe(2);
+  });
+
+  it("mejor racha histórica mayor que la actual", () => {
+    const dates = ["2026-08-01", "2026-08-02", "2026-08-03", "2026-09-05", "2026-09-06"];
+    expect(computeStreaks(dates, today)).toEqual({ current: 2, best: 3 });
+  });
+
+  it("ignora fechas duplicadas", () => {
+    const dates = ["2026-09-06", "2026-09-06", "2026-09-07", "2026-09-07"];
+    expect(computeStreaks(dates, today)).toEqual({ current: 2, best: 2 });
   });
 });
 

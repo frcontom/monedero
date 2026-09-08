@@ -7,7 +7,7 @@ export const dateModeSchema = z.enum(["TARGET_DATE", "NO_DATE"]);
 export const planningModeSchema = z.enum(["PERIODIC", "FLEXIBLE"]);
 export const periodicitySchema = z.enum(["DAILY", "WEEKLY", "MONTHLY"]);
 export const goalStatusSchema = z.enum(["ACTIVE", "PAUSED", "COMPLETED", "CANCELLED"]);
-export const categorySchema = z.enum(["AHORRO", "COMPRA", "DEUDA", "VIAJE", "FONDO", "OTRO"]);
+export const categorySchema = z.string().trim().min(1, "Categoría requerida").max(50);
 export const movementTypeSchema = z.enum(["deposit", "withdrawal"]);
 
 const goalFields = {

@@ -10,8 +10,9 @@ import {
   parseISO,
   startOfWeek,
 } from "date-fns";
-import { useJournal } from "@/lib/client/hooks";
+import { useJournal, useJournalHeatmap } from "@/lib/client/hooks";
 import { formatMoney } from "@/lib/money";
+import { ContributionHeatmap } from "@/components/journal/contribution-heatmap";
 
 const WEEKDAYS = ["L", "M", "X", "J", "V", "S", "D"];
 
@@ -30,6 +31,7 @@ export function JournalView() {
   const [selected, setSelected] = useState<string | null>(null);
 
   const { data, isLoading } = useJournal(monthStr);
+  const heatmap = useJournalHeatmap(16);
 
   const monthStart = parseISO(`${monthStr}-01`);
   const gridStart = startOfWeek(monthStart, { weekStartsOn: 1 });
@@ -67,6 +69,10 @@ export function JournalView() {
           </button>
         </div>
       </div>
+
+      {heatmap.data ? (
+        <ContributionHeatmap days={heatmap.data.days} />
+      ) : null}
 
       <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3">
         <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-slate-500 dark:text-slate-400">

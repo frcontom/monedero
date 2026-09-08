@@ -14,11 +14,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { useAnalytics, useGoals } from "@/lib/client/hooks";
+import { useAnalytics, useCategoryAnalytics, useGoals } from "@/lib/client/hooks";
 import { formatMoney } from "@/lib/money";
 
 export function AnalyticsView() {
   const goals = useGoals();
+  const categoryAnalytics = useCategoryAnalytics();
   const [goalId, setGoalId] = useState<string>("");
 
   const effectiveGoalId = goalId || goals.data?.goals[0]?.id || "";
@@ -58,6 +59,43 @@ export function AnalyticsView() {
         <p className="rounded-2xl border border-dashed border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 p-6 text-center text-slate-500 dark:text-slate-400">
           Crea una meta para ver analítica.
         </p>
+      )}
+
+      {categoryAnalytics.data && categoryAnalytics.data.categories.length > 0 && (
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
+          <h2 className="mb-3 font-semibold">Por categoría</h2>
+          <div className="flex flex-col gap-2">
+            {categoryAnalytics.data.categories.map((c) => {
+              const max = Math.max(...categoryAnalytics.data!.categories.map((x) => Math.abs(x.net)), 1);
+              const pct = Math.min(100, (Math.abs(c.net) / max) * 100);
+              return (
+                <div key={c.category} className="flex items-center gap-3">
+                  <span
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-base"
+                    style={{ backgroundColor: `${c.color}22` }}
+                  >
+                    {c.icon}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="truncate font-medium">{c.category}</span>
+                      <span className={c.net >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}>
+                        {c.net >= 0 ? "+" : "−"}
+                        {formatMoney(Math.abs(c.net))}
+                      </span>
+                    </div>
+                    <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                      <div
+                        className="h-full rounded-full"
+                        style={{ width: `${pct}%`, backgroundColor: c.color }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       )}
 
       {selectedGoal && data.data && (

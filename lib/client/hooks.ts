@@ -15,6 +15,7 @@ export const qk = {
   projection: (id: string) => ["goals", id, "projection"],
   analytics: (id: string) => ["goals", id, "analytics"],
   dashboard: ["dashboard"],
+  categories: ["categories"],
 };
 
 export function useGoals() {
@@ -31,6 +32,45 @@ export function useDashboard() {
 
 export function useJournal(month: string) {
   return useQuery({ queryKey: ["journal", month], queryFn: () => api.journal(month) });
+}
+
+export function useJournalHeatmap(weeks = 16) {
+  return useQuery({ queryKey: ["journal", "heatmap", weeks], queryFn: () => api.journalHeatmap(weeks) });
+}
+
+export function useCategories() {
+  return useQuery({ queryKey: qk.categories, queryFn: () => api.categories() });
+}
+
+export function useCreateCategory() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: api.createCategory,
+    onSuccess: () => qc.invalidateQueries({ queryKey: qk.categories }),
+  });
+}
+
+export function useUpdateCategory() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Parameters<typeof api.updateCategory>[1] }) =>
+      api.updateCategory(id, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: qk.categories });
+      invalidateAll(qc);
+    },
+  });
+}
+
+export function useDeleteCategory() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.deleteCategory(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: qk.categories });
+      invalidateAll(qc);
+    },
+  });
 }
 
 export function useMovements(goalId: string) {
@@ -55,6 +95,10 @@ export function useAnalytics(goalId: string) {
     queryFn: () => api.analytics(goalId),
     enabled: !!goalId,
   });
+}
+
+export function useCategoryAnalytics() {
+  return useQuery({ queryKey: ["analytics", "categories"], queryFn: () => api.categoryAnalytics() });
 }
 
 function invalidateAll(queryClient: ReturnType<typeof useQueryClient>) {

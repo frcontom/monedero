@@ -8,6 +8,10 @@ const createMutate = vi.fn();
 vi.mock("@/lib/client/hooks", () => ({
   useCreateGoal: () => ({ mutate: createMutate, isPending: false, isError: false, error: null }),
   useUpdateGoal: () => ({ mutate: vi.fn(), isPending: false, isError: false, error: null }),
+  useCategories: () => ({
+    data: { categories: [{ id: "1", name: "OTRO", color: "#64748b", icon: "📌" }] },
+    isLoading: false,
+  }),
 }));
 
 describe("GoalModal submit", () => {

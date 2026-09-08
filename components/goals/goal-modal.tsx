@@ -7,8 +7,8 @@ import { Modal } from "@/components/ui/modal";
 import { MoneyInput } from "@/components/ui/currency-input";
 import { goalSchema } from "@/lib/validators/goal";
 import type { GoalInput } from "@/lib/validators/goal";
-import { useCreateGoal, useUpdateGoal } from "@/lib/client/hooks";
-import { CATEGORY_LABEL, PERIODICITY_LABEL } from "@/components/goals/labels";
+import { useCreateGoal, useUpdateGoal, useCategories } from "@/lib/client/hooks";
+import { PERIODICITY_LABEL } from "@/components/goals/labels";
 import type { GoalSummary } from "@/lib/types";
 import { todayLocal } from "@/lib/calc/goals";
 
@@ -18,7 +18,6 @@ type Props = {
   goal?: GoalSummary | null;
 };
 
-const categoryOptions = Object.entries(CATEGORY_LABEL);
 const periodicityOptions = Object.entries(PERIODICITY_LABEL);
 
 function toDefaults(goal?: GoalSummary | null): GoalInput {
@@ -55,6 +54,7 @@ export function GoalModal({ open, onClose, goal }: Props) {
   const isEdit = Boolean(goal);
   const createMutation = useCreateGoal();
   const updateMutation = useUpdateGoal();
+  const categories = useCategories();
   const mutation = isEdit ? updateMutation : createMutation;
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -257,9 +257,9 @@ export function GoalModal({ open, onClose, goal }: Props) {
             Categoría
           </label>
           <select id="category" className={inputClass} {...register("category")}>
-            {categoryOptions.map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
+            {categories.data?.categories.map((c) => (
+              <option key={c.id} value={c.name}>
+                {c.icon} {c.name}
               </option>
             ))}
           </select>

@@ -12,6 +12,47 @@ export function todayLocal(): string {
   return format(new Date(), "yyyy-MM-dd");
 }
 
+export function computeStreaks(depositDates: string[], today: string = todayLocal()): { current: number; best: number } {
+  const unique = [...new Set(depositDates)];
+  if (unique.length === 0) return { current: 0, best: 0 };
+
+  const days = unique
+    .map((d) => parseISO(d))
+    .sort((a, b) => a.getTime() - b.getTime());
+
+  let best = 1;
+  let run = 1;
+  for (let i = 1; i < days.length; i++) {
+    if (differenceInCalendarDays(days[i], days[i - 1]) === 1) {
+      run += 1;
+      best = Math.max(best, run);
+    } else {
+      run = 1;
+    }
+  }
+
+  const todayDate = parseISO(today);
+  const last = days[days.length - 1];
+  if (differenceInCalendarDays(todayDate, last) > 1) {
+    return { current: 0, best };
+  }
+
+  const set = new Set(days.map((d) => d.getTime()));
+  let current = 1;
+  let prev = last;
+  for (let i = 1; i < days.length; i++) {
+    const p = addDays(prev, -1);
+    if (set.has(p.getTime())) {
+      current += 1;
+      prev = p;
+    } else {
+      break;
+    }
+  }
+
+  return { current, best };
+}
+
 export function accumulated(movements: MovementLike[]): number {
   return movements.reduce(
     (acc, m) => acc + (m.type === "deposit" ? m.amount : -m.amount),

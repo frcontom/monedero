@@ -7,7 +7,6 @@ import type { GoalSummary } from "@/lib/types";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { QuickMovementModal } from "@/components/goals/quick-movement";
 import {
-  CATEGORY_LABEL,
   PERFORMANCE_COLOR,
   PERFORMANCE_LABEL,
   STATUS_LABEL,
@@ -26,7 +25,7 @@ export function GoalCard({ goal }: { goal: GoalSummary }) {
           <div className="min-w-0">
             <h3 className="truncate font-semibold">{goal.name}</h3>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              {CATEGORY_LABEL[goal.category]} · {STATUS_LABEL[goal.status]}
+              {goal.categoryIcon ?? ""} {goal.category} · {STATUS_LABEL[goal.status]}
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-1">

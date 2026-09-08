@@ -81,6 +81,20 @@ export function DashboardView() {
         ))}
       </div>
 
+      <div className="rounded-2xl border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950 p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs text-orange-700 dark:text-orange-300">Racha actual</p>
+            <p className="text-2xl font-bold text-orange-800 dark:text-orange-200">
+              🔥 {data.streak.current} día{data.streak.current === 1 ? "" : "s"}
+            </p>
+          </div>
+          <p className="text-sm text-orange-700 dark:text-orange-300">
+            Mejor racha: {data.streak.best} día{data.streak.best === 1 ? "" : "s"}
+          </p>
+        </div>
+      </div>
+
       {attentionGoals.length > 0 && (
         <div className="rounded-2xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950 p-4">
           <h2 className="mb-2 font-semibold text-amber-900 dark:text-amber-200">Requieren atención</h2>

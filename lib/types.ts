@@ -4,7 +4,9 @@ export type GoalSummary = {
   id: string;
   name: string;
   description: string | null;
-  category: "AHORRO" | "COMPRA" | "DEUDA" | "VIAJE" | "FONDO" | "OTRO";
+  category: string;
+  categoryColor: string | null;
+  categoryIcon: string | null;
   status: "ACTIVE" | "PAUSED" | "COMPLETED" | "CANCELLED";
   dateMode: "TARGET_DATE" | "NO_DATE";
   targetDate: string | null;
@@ -53,6 +55,10 @@ export type DashboardData = {
     onTrack: number;
     needsAttention: number;
     behind: number;
+  };
+  streak: {
+    current: number;
+    best: number;
   };
   recentActivity: Movement[];
 };

@@ -1,12 +1,13 @@
 import "server-only";
 import { addDays, format } from "date-fns";
-import { desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray, ne } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { movements } from "@/drizzle/schema";
+import { categories, goals, movements } from "@/drizzle/schema";
 import { listGoals, requireOwnedGoal } from "@/lib/repo/goals";
 import {
   PERIOD_DAYS,
   accumulated,
+  computeStreaks,
   daysSinceStart,
   daysUntilTarget,
   expectedAccumulated,
@@ -82,6 +83,13 @@ export async function getDashboard(userId: string): Promise<DashboardData> {
         .limit(10)
     : [];
 
+  const depositRows = activeIds.length
+    ? await db
+        .select({ date: movements.date })
+        .from(movements)
+        .where(and(inArray(movements.goalId, activeIds), eq(movements.type, "deposit")))
+    : [];
+
   return {
     totals: {
       goals: active.length,
@@ -92,6 +100,7 @@ export async function getDashboard(userId: string): Promise<DashboardData> {
     },
     byStatus,
     performance,
+    streak: computeStreaks(depositRows.map((r) => r.date)),
     recentActivity: recentRows.map(toDto),
   };
 }
@@ -174,6 +183,61 @@ export async function getProjection(userId: string, goalId: string): Promise<Pro
     recoveryAmount: behind > 0 && rates.daily !== null ? behind + rates.daily : 0,
     lastMovementDaysAgo,
   };
+}
+
+export async function getCategoryAnalytics(userId: string) {
+  const rows = await db
+    .select({
+      goalId: goals.id,
+      goalName: goals.name,
+      category: goals.category,
+      catColor: categories.color,
+      catIcon: categories.icon,
+      type: movements.type,
+      amount: movements.amount,
+    })
+    .from(movements)
+    .innerJoin(goals, eq(movements.goalId, goals.id))
+    .leftJoin(
+      categories,
+      and(eq(categories.userId, goals.userId), eq(categories.name, goals.category)),
+    )
+    .where(and(eq(goals.userId, userId), ne(goals.status, "CANCELLED")));
+
+  const map = new Map<
+    string,
+    {
+      category: string;
+      icon: string;
+      color: string;
+      deposits: number;
+      withdrawals: number;
+      net: number;
+      goals: Set<string>;
+    }
+  >();
+  for (const r of rows) {
+    const bucket =
+      map.get(r.category) ??
+      {
+        category: r.category,
+        icon: r.catIcon ?? "📌",
+        color: r.catColor ?? "#64748b",
+        deposits: 0,
+        withdrawals: 0,
+        net: 0,
+        goals: new Set<string>(),
+      };
+    bucket.goals.add(r.goalId);
+    if (r.type === "deposit") bucket.deposits += r.amount;
+    else bucket.withdrawals += r.amount;
+    bucket.net = bucket.deposits - bucket.withdrawals;
+    map.set(r.category, bucket);
+  }
+
+  return [...map.values()]
+    .map((b) => ({ ...b, goalCount: b.goals.size, goals: undefined }))
+    .sort((a, b) => b.net - a.net);
 }
 
 export async function getAnalytics(userId: string, goalId: string): Promise<AnalyticsData> {

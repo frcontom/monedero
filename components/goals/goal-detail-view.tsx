@@ -12,7 +12,6 @@ import {
   useSetStatus,
 } from "@/lib/client/hooks";
 import {
-  CATEGORY_LABEL,
   PERFORMANCE_COLOR,
   PERFORMANCE_LABEL,
   STATUS_LABEL,
@@ -20,6 +19,7 @@ import {
 import { GoalModal } from "@/components/goals/goal-modal";
 import { MovementForm } from "@/components/goals/movement-form";
 import { MovementHistory } from "@/components/goals/movement-history";
+import { ProjectionScenario } from "@/components/goals/projection-scenario";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { ProgressCurve } from "@/components/charts/progress-curve";
 
@@ -141,7 +141,7 @@ export function GoalDetailView({ goalId }: { goalId: string }) {
           <div className="order-2 min-w-0 md:order-1 md:flex-1">
             <h1 className="text-xl font-bold">{goal.name}</h1>
             <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
-              {CATEGORY_LABEL[goal.category]} · {STATUS_LABEL[goal.status]}
+              {goal.categoryIcon ?? ""} {goal.category} · {STATUS_LABEL[goal.status]}
               {goal.targetDate ? ` · Objetivo: ${formatDate(goal.targetDate)}` : ""}
             </p>
             {goal.description && <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{goal.description}</p>}
@@ -219,6 +219,7 @@ export function GoalDetailView({ goalId }: { goalId: string }) {
               Último movimiento: hace {p.lastMovementDaysAgo} día{p.lastMovementDaysAgo === 1 ? "" : "s"}
             </p>
           )}
+          <ProjectionScenario goal={goal} />
         </div>
       )}
 
