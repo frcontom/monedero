@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { MobileNav } from "@/components/nav/mobile-nav";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard" },
@@ -22,7 +23,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 transition hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-slate-100"
+                className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 transition hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-slate-100"
               >
                 {item.label}
               </Link>
@@ -37,19 +38,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       <main className="mx-auto max-w-5xl px-4 pb-24 pt-6 md:pb-10">{children}</main>
 
-      <nav className="fixed inset-x-0 bottom-0 z-10 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 md:hidden">
-        <div className="grid grid-cols-4">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex flex-col items-center gap-0.5 py-2 text-xs font-medium text-slate-600 dark:text-slate-400"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </div>
-      </nav>
+      <MobileNav />
     </div>
   );
 }

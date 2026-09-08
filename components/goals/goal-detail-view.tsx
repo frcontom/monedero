@@ -67,45 +67,59 @@ export function GoalDetailView({ goalId }: { goalId: string }) {
       </Link>
 
       <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h1 className="text-xl font-bold">{goal.name}</h1>
-            <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
-              {CATEGORY_LABEL[goal.category]} · {STATUS_LABEL[goal.status]}
-              {goal.targetDate ? ` · Objetivo: ${formatDate(goal.targetDate)}` : ""}
-            </p>
-            {goal.description && <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{goal.description}</p>}
-          </div>
-          <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <div className="order-1 flex flex-wrap gap-2 md:order-2 md:justify-end">
             {!isDone && (
               <>
                 {isActive && (
                   <>
-                    <button onClick={() => runStatus("PAUSED")} className="rounded-lg bg-slate-100 dark:bg-slate-800 px-3 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600">
-                      Pausar
+                    <button
+                      onClick={() => runStatus("PAUSED")}
+                      aria-label="Pausar meta"
+                      className="flex items-center gap-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600"
+                    >
+                      <span>⏸</span>
+                      <span className="hidden sm:inline">Pausar</span>
                     </button>
-                    <button onClick={() => runStatus("COMPLETED")} className="rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700">
-                      Completar
+                    <button
+                      onClick={() => runStatus("COMPLETED")}
+                      aria-label="Completar meta"
+                      className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+                    >
+                      <span>✓</span>
+                      <span className="hidden sm:inline">Completar</span>
                     </button>
                   </>
                 )}
                 {isPaused && (
-                  <button onClick={() => runStatus("ACTIVE")} className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700">
-                    Reanudar
+                  <button
+                    onClick={() => runStatus("ACTIVE")}
+                    aria-label="Reanudar meta"
+                    className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                  >
+                    <span>▶</span>
+                    <span className="hidden sm:inline">Reanudar</span>
                   </button>
                 )}
               </>
             )}
             {isDone && (
-              <button onClick={() => runStatus("ACTIVE")} className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700">
-                Reabrir
+              <button
+                onClick={() => runStatus("ACTIVE")}
+                aria-label="Reabrir meta"
+                className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              >
+                <span>↺</span>
+                <span className="hidden sm:inline">Reabrir</span>
               </button>
             )}
             <button
               onClick={() => setEditOpen(true)}
-              className="rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-1.5 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-700"
+              aria-label="Editar meta"
+              className="flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-3 py-2 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-700"
             >
-              Editar
+              <span>✎</span>
+              <span className="hidden sm:inline">Editar</span>
             </button>
             <button
               onClick={() => {
@@ -116,10 +130,21 @@ export function GoalDetailView({ goalId }: { goalId: string }) {
                   });
                 }
               }}
-              className="rounded-lg border border-red-200 dark:border-red-900 px-3 py-1.5 text-sm font-medium text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950"
+              aria-label="Eliminar meta"
+              className="flex items-center gap-1.5 rounded-lg border border-red-200 dark:border-red-900 px-3 py-2 text-sm font-medium text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950"
             >
-              🗑 Eliminar
+              <span>🗑</span>
+              <span className="hidden sm:inline">Eliminar</span>
             </button>
+          </div>
+
+          <div className="order-2 min-w-0 md:order-1 md:flex-1">
+            <h1 className="text-xl font-bold">{goal.name}</h1>
+            <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
+              {CATEGORY_LABEL[goal.category]} · {STATUS_LABEL[goal.status]}
+              {goal.targetDate ? ` · Objetivo: ${formatDate(goal.targetDate)}` : ""}
+            </p>
+            {goal.description && <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{goal.description}</p>}
           </div>
         </div>
 
